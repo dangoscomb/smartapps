@@ -31,6 +31,9 @@ preferences {
     section("Door") {
 		input("gdoor","capability.garageDoorControl")
 	}
+    section("Light") {
+		input("glight","capability.switch")
+	}
     section("Timeframes") {
     	input "minm", "number", required: true, title: "Min. Minutes Away?"
         input "maxm", "number", required: true, title: "Max. Minutes Away?"
@@ -58,6 +61,7 @@ def presence(evt) {
     if (evt.value == "not present") {
         log.debug "checking the garage door is closed"
         gdoor.close()
+        glight.off()
     }
     else {
         log.debug "present; check we've been out for a while..."
@@ -67,6 +71,8 @@ def presence(evt) {
         if(diff > minm && diff < maxm) {
         	log.debug "Timeframe constraint met... opening the garage"
             gdoor.open();
+            glight.on();
+            glight.setLevel(99);
         }
         else {
 			log.debug "Timeframe constraint check failed. $minm - $maxm"
